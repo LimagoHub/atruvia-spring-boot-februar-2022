@@ -2,11 +2,9 @@ package de.bankenit.webapp.restcontrollers;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 import javax.validation.Valid;
 
-import org.glassfish.jersey.uri.UriComponent;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -19,10 +17,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.util.UriComponents;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import de.bankenit.webapp.restcontrollers.dtos.PersonDTO;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.extern.slf4j.Slf4j;
 
 @RestController
@@ -37,13 +34,19 @@ public class PersonenController {
 			PersonDTO.builder().id("4").vorname("John").nachname("Wick").build()
 	);
 
+	@ApiResponse(responseCode = "200", description = "Liste wurde erstellr")
+    @ApiResponse(responseCode = "400", description = "Bad Request" )
+	@ApiResponse(responseCode = "500", description = "Interner Serverfehler")
 	@GetMapping(path = "/person", produces = {MediaType.APPLICATION_JSON_VALUE,MediaType.APPLICATION_XML_VALUE})
 	public ResponseEntity<PersonDTO> getPerson() {
 		PersonDTO result =  PersonDTO.builder().id("1").vorname("John").nachname("Doe").build();
 		
 		return ResponseEntity.ok(result);
 	}
-	
+	@ApiResponse(responseCode = "200", description = "Person wurde gefunden")
+    @ApiResponse(responseCode = "404", description = "Person wurde nicht gefunden" )
+	@ApiResponse(responseCode = "400", description = "Bad Request" )
+	@ApiResponse(responseCode = "500", description = "Interner Serverfehler")
 	@GetMapping(path = "/{id}", produces = {MediaType.APPLICATION_JSON_VALUE})
 	public ResponseEntity<PersonDTO> getPersonByID(@PathVariable String id) {
 		Optional<PersonDTO> myOptional = personen.stream().filter(p->p.getId().equals(id)).findFirst();
@@ -88,4 +91,18 @@ public class PersonenController {
 //		return ResponseEntity.created(uriComponent.toUri()).build();
 //	}
 	
+	@PostMapping(path = "/to-upper", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<PersonDTO> toUpper(@RequestBody  PersonDTO source) {
+        source.setVorname(source.getVorname().toUpperCase());
+        source.setNachname(source.getNachname().toUpperCase());
+        return ResponseEntity.ok(source);
+    }
+	
+	@PutMapping(path = "/{id}/to-upper")
+	public ResponseEntity<Void> toUpperById(@PathVariable String id) {
+        // Serviceaufruf zum Ändern
+        return ResponseEntity.ok().build(); // ggf. NotFound
+    }
+	
+
 }
