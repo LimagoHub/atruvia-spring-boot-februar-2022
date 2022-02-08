@@ -19,64 +19,55 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import de.bankenit.webapp.restcontrollers.dtos.PersonDTO;
+import de.bankenit.webapp.restcontrollers.mappers.PersonDTOMapper;
+import de.bankenit.webapp.services.PersonenService;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequestMapping("/v1/personen")
 @Slf4j
+@AllArgsConstructor
 public class PersonenController {
 
-	private final List<PersonDTO> personen = List.of(
-			PersonDTO.builder().id("1").vorname("John").nachname("Doe").build(),
-			PersonDTO.builder().id("2").vorname("John").nachname("Rambo").build(),
-			PersonDTO.builder().id("3").vorname("John").nachname("McClain").build(),
-			PersonDTO.builder().id("4").vorname("John").nachname("Wick").build()
-	);
+	private final PersonenService service;
+	private final PersonDTOMapper mapper;
 
-	@ApiResponse(responseCode = "200", description = "Liste wurde erstellr")
-    @ApiResponse(responseCode = "400", description = "Bad Request" )
-	@ApiResponse(responseCode = "500", description = "Interner Serverfehler")
-	@GetMapping(path = "/person", produces = {MediaType.APPLICATION_JSON_VALUE,MediaType.APPLICATION_XML_VALUE})
-	public ResponseEntity<PersonDTO> getPerson() {
-		PersonDTO result =  PersonDTO.builder().id("1").vorname("John").nachname("Doe").build();
-		
-		return ResponseEntity.ok(result);
-	}
+	
 	@ApiResponse(responseCode = "200", description = "Person wurde gefunden")
     @ApiResponse(responseCode = "404", description = "Person wurde nicht gefunden" )
 	@ApiResponse(responseCode = "400", description = "Bad Request" )
 	@ApiResponse(responseCode = "500", description = "Interner Serverfehler")
 	@GetMapping(path = "/{id}", produces = {MediaType.APPLICATION_JSON_VALUE})
-	public ResponseEntity<PersonDTO> getPersonByID(@PathVariable String id) {
-		Optional<PersonDTO> myOptional = personen.stream().filter(p->p.getId().equals(id)).findFirst();
-		return ResponseEntity.of(myOptional);
+	public ResponseEntity<PersonDTO> getPersonByID(@PathVariable String id) throws Exception {
+		
+		return ResponseEntity.of(service.findeNachId(id).map(mapper::convert));
 	}
 	
 	
 	@GetMapping(path = "", produces = {MediaType.APPLICATION_JSON_VALUE})
 	public ResponseEntity<Iterable<PersonDTO>> getAllPersons(
 			@RequestParam(required = false, defaultValue = "") String vorname,
-			@RequestParam(required = false, defaultValue = "") String nachname) {
+			@RequestParam(required = false, defaultValue = "") String nachname)throws Exception {
 		// Filtern fehlt
-		return ResponseEntity.ok(personen);
+		return ResponseEntity.ok(mapper.convert(service.findeAlle()));
 	}
 	
 	
 	
 	@DeleteMapping(path = "/{id}")
-	public ResponseEntity<Void> deletePersonById(@PathVariable String id) {
-		Optional<PersonDTO> myOptional = personen.stream().filter(p->p.getId().equals(id)).findFirst();
-		if(myOptional.isPresent()) {
-			log.warn("person wurde gelöscht " + myOptional.get());
+	public ResponseEntity<Void> deletePersonById(@PathVariable String id) throws Exception{
+		if(service.loeschen(id)) {
 			return ResponseEntity.ok().build();
 		}
 		return ResponseEntity.notFound().build();
 	}
 	
 	@PutMapping(path = "", consumes = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<Void> saveOrUpdate(@Valid @RequestBody PersonDTO person) {
-		System.out.println("person wird gespeichert: " + person);
+	public ResponseEntity<Void> saveOrUpdate(@Valid @RequestBody PersonDTO person) throws Exception{
+		if(service.speichernOderEinfuegen(mapper.convert(person)))
+			return ResponseEntity.ok().build();
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
 	
@@ -98,11 +89,11 @@ public class PersonenController {
         return ResponseEntity.ok(source);
     }
 	
-	@PutMapping(path = "/{id}/to-upper")
-	public ResponseEntity<Void> toUpperById(@PathVariable String id) {
-        // Serviceaufruf zum Ändern
-        return ResponseEntity.ok().build(); // ggf. NotFound
-    }
+//	@PutMapping(path = "/{id}/to-upper")
+//	public ResponseEntity<Void> toUpperById(@PathVariable String id) {
+//        // Serviceaufruf zum Ändern
+//        return ResponseEntity.ok().build(); // ggf. NotFound
+//    }
 	
 
 }
