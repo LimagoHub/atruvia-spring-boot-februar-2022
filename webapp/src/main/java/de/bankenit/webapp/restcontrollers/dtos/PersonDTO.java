@@ -31,7 +31,5 @@ public class PersonDTO {
 	@Size(min = 2, max=30)
 	private String nachname;
 	
-	@NotNull
-	private LocalDateTime version;
-
+	
 }

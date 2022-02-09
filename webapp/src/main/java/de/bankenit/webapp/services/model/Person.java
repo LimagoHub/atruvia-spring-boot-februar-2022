@@ -17,5 +17,5 @@ public class Person {
 	private String id;
 	private String vorname;
 	private String nachname;
-	private LocalDateTime version;
+	
 }
