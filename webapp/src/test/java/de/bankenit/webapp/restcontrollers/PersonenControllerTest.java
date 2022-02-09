@@ -1,7 +1,10 @@
 package de.bankenit.webapp.restcontrollers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
@@ -15,11 +18,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import de.bankenit.webapp.restcontrollers.dtos.PersonDTO;
@@ -39,6 +42,9 @@ public class PersonenControllerTest {
 	 @MockBean
 	 private PersonenService serviceMock;
 	
+	 private final String validUUID = "b2e24e74-8686-43ea-baff-d9396b4202e0";
+	 private final PersonDTO validPersonDTO = PersonDTO.builder().id(validUUID).vorname("John").nachname("Doe").build();
+	 
 	@Test
 	void test1() throws Exception {
 		
@@ -92,5 +98,18 @@ public class PersonenControllerTest {
 		assertEquals(2,StreamSupport.stream(entity.getBody().spliterator(), false).count());
 	}
 
+	 @Test
+	 void test6() throws Exception{
+		 HttpEntity<PersonDTO> httpEntity =new HttpEntity<>(validPersonDTO);
+		 when(serviceMock.speichernOderEinfuegen(any())).thenReturn(true);
+		 ResponseEntity<Void> entity =
+	                restTemplate.exchange(
+	                        "/v1/personen",
+	                        HttpMethod.PUT,
+	                        httpEntity
+	                        , Void.class);
+		 assertEquals(HttpStatus.OK,entity.getStatusCode());
+	     verify(serviceMock, times(1)).speichernOderEinfuegen(Person.builder().id(validUUID).vorname("John").nachname("Doe").build());
 
+	 }
 }
