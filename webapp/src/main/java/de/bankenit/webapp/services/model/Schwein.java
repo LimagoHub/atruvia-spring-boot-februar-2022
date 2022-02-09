@@ -1,9 +1,5 @@
 package de.bankenit.webapp.services.model;
 
-import javax.persistence.Column;
-import javax.persistence.Id;
-
-import de.bankenit.webapp.repositories.entity.SchweinEntity;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
