@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class MyAsyncDemo {
 
-	@Async
+	@Async("demo")
 	public CompletableFuture<Integer> sinnDesLebens() {
 		// Berechne
 		return CompletableFuture.completedFuture(42);
