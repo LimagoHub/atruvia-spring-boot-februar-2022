@@ -16,7 +16,7 @@ public class Schwein {
 	@Setter( AccessLevel.PRIVATE)
 	private String id;
 	
-	
+	@Setter( AccessLevel.PRIVATE)
 	private String name;
 	
 	@Setter( AccessLevel.PRIVATE)
@@ -24,6 +24,11 @@ public class Schwein {
 	
 	public void fressen() {
 		setGewicht(getGewicht() + 1);
+	}
+
+	public void taufen(String neuerName) {
+		if("Elsa".equalsIgnoreCase(neuerName)) throw new IllegalArgumentException("Hä?");
+		setName(neuerName);
 	}
 
 }
