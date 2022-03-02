@@ -1,5 +1,6 @@
 package de.bankenit.asyncdemo;
 
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 
 import org.springframework.scheduling.annotation.Async;
@@ -10,8 +11,8 @@ import org.springframework.stereotype.Component;
 public class MyAsyncDemo {
 
 	@Async
-	public Future<Integer> sinnDesLebens() {
+	public CompletableFuture<Integer> sinnDesLebens() {
 		// Berechne
-		return new AsyncResult<Integer>(42);
+		return CompletableFuture.completedFuture(42);
 	}
 }

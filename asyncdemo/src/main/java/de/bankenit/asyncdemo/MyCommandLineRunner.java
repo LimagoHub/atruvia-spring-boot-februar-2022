@@ -1,6 +1,7 @@
 package de.bankenit.asyncdemo;
 
 import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -21,7 +22,7 @@ public class MyCommandLineRunner implements CommandLineRunner {
 		System.out.println("Hallo");
 		
 	
-		Future<Integer> result = demo.sinnDesLebens();
+		CompletableFuture<Integer> result = demo.sinnDesLebens();
 		System.out.println(result.get());
 	}
 	
